@@ -4,6 +4,17 @@ on:
   push:
     branches: [main]
 
+# -----------------------------------------------------------
+# [추가된 부분] 동시성 제어 설정
+# -----------------------------------------------------------
+concurrency:
+  # 그룹 이름: 워크플로우 이름과 브랜치를 조합하여 유니크하게 식별
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # true: 진행 중인 배포를 취소하고 새 배포 시작 (빌드 단계에선 좋지만 ECS 배포엔 위험할 수 있음)
+  # false: 진행 중인 배포가 끝날 때까지 대기 (ECS 배포에 권장)
+  cancel-in-progress: false 
+# -----------------------------------------------------------
+
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: bbs
@@ -17,8 +28,8 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
+      # ... (이하 기존 steps와 동일) ...
       - name: Checkout
         uses: actions/checkout@v4
 
